@@ -1,5 +1,8 @@
 import 'package:cv/info.dart';
+import 'package:cv/sign_up.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   @override
@@ -12,13 +15,39 @@ class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
+  Future<void> _login() async {
+    // Proceed with signup
+    final response = await http.post(
+      Uri.parse('http://localhost/flutter_auth/login.php'),
+      body: {
+        'username': _usernameController.text,
+        'password': _passwordController.text,
+      },
+    );
+
+    final result = jsonDecode(response.body);
+    if (response.statusCode == 200 && result['message'] == "Login successful") {
+      // Display a message to the user based on the response from the server
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Incorrect username or password'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 123, 64, 231),
+      backgroundColor: Color.fromARGB(255, 243, 240, 241),
       appBar: AppBar(
         title: Text('Login'),
-        backgroundColor: Color.fromARGB(141, 71, 244, 3),
+        backgroundColor: Color.fromARGB(255, 1, 255, 1),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,13 +64,13 @@ class _LoginState extends State<Login> {
               ),
               TextFormField(
                 style: TextStyle(
-                  color: Color.fromARGB(255, 245, 238, 238),
+                  color: Color.fromARGB(255, 26, 24, 24),
                 ),
                 controller: _usernameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
                   labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 244, 237, 237),
+                    color: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
                 validator: (value) {
@@ -54,19 +83,21 @@ class _LoginState extends State<Login> {
               SizedBox(height: 20),
               TextFormField(
                 style: TextStyle(
-                  color: Color.fromARGB(255, 245, 241, 241),
+                  color: Color.fromARGB(255, 0, 0, 0),
                 ),
                 controller: _passwordController,
                 obscureText: !_passwordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 249, 240, 240),
+                    color: Color.fromARGB(255, 0, 0, 0),
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey,
+                      _passwordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: const Color.fromARGB(255, 17, 16, 16),
                     ),
                     onPressed: () {
                       setState(() {
@@ -84,31 +115,15 @@ class _LoginState extends State<Login> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 217, 0, 255)),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 3, 221, 50)),
                 onPressed: () {
-                  if (_formKey.currentState?.validate() == true) {
-                    // Check for specific username and password
-                    if (_usernameController.text == "lafortezajayson0@email.com" &&
-                        _passwordController.text == "Laforteza@123") {
-                      // Successful login
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
-                    } else {
-                      // Incorrect username or password
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Incorrect username or password'),
-                        ),
-                      );
-                    }
-                  }
+                  _login();
                 },
                 child: Text(
                   'Login',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 5, 5, 5),
+                    color: Color.fromARGB(255, 240, 240, 240),
                     fontSize: 20,
                   ),
                 ),
@@ -117,7 +132,7 @@ class _LoginState extends State<Login> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>HomeScreen()),
+                    MaterialPageRoute(builder: (context) => SignupPage()),
                   );
                 },
                 child: Text('Sign Up'),
